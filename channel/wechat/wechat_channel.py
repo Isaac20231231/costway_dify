@@ -9,7 +9,7 @@ import json
 import os
 import threading
 import time
-import random
+
 import requests
 
 from bridge.context import *
@@ -33,136 +33,19 @@ def handler_single_msg(msg):
     except NotImplementedError as e:
         logger.debug("[WX]single message {} skipped: {}".format(msg["MsgId"], e))
         return None
-    # 如果收到的是自定义消息
-    if cmsg.ctype == ContextType.TEXT and cmsg.content == "测试":
-        # 发送自定义回复
-        itchat.send("回复测试消息", toUserName=cmsg.other_user_id)
-        return
-    if cmsg.ctype == ContextType.TEXT and cmsg.content == "测试图片回复":
-        # 发送图片回复
-        itchat.send_image("/Users/isaac/Documents/costway_dify/static_files/image/test.jpg",
-                          toUserName=cmsg.other_user_id)
-        return
-    if cmsg.ctype == ContextType.TEXT and cmsg.content == "测试视频回复":
-        # 发送视频回复
-        itchat.send_video("/Users/isaac/Documents/costway_dify/static_files/video/test.mp4",
-                          toUserName=cmsg.other_user_id)
-        return
-    if cmsg.ctype == ContextType.TEXT and cmsg.content == "测试文件回复":
-        # 发送文件回复
-        itchat.send_file("/Users/isaac/Documents/costway_dify/static_files/file/test.txt",
-                         toUserName=cmsg.other_user_id)
-        return
     WechatChannel().handle_single(cmsg)
     return None
 
 
 @itchat.msg_register([TEXT, VOICE, PICTURE, NOTE, ATTACHMENT, SHARING], isGroupChat=True)
 def handler_group_msg(msg):
-    image_path = "/Users/isaac/Documents/costway_dify/static_files/image/"
-    image_path_data = "/Users/isaac/Documents/costway_dify/static_files/image/咸鱼资料/"
-
-    image_path_dog = "/Users/isaac/Documents/costway_dify/static_files/image/舔狗日记"
-    image_path_man = "/Users/isaac/Documents/costway_dify/static_files/image/渣男语录"
-    image_dict = {
-        "进阶图": f"{image_path_data}进阶图.jpg",
-        "金币图": f"{image_path_data}金币图.jpg",
-        "军团币": f"{image_path_data}军团币.jpg",
-        "VIP图": f"{image_path_data}VIP图.jpg",
-        "玩具被动": f"{image_path_data}玩具被动.jpg",
-        "武将升星": f"{image_path_data}武将升星.jpg",
-        "梦魔水晶": f"{image_path_data}梦魔水晶.jpg",
-        "玩具扳手": f"{image_path_data}玩具扳手.jpg",
-        "每日咸王": f"{image_path_data}每日咸王.jpg",
-        "排位对战": f"{image_path_data}排位对战.jpg",
-        "金色水晶": f"{image_path_data}金色水晶.jpg",
-        "红色水晶": f"{image_path_data}红色水晶.jpg",
-        "属性上限": f"{image_path_data}属性上限.jpg",
-        "洗练属性": f"{image_path_data}洗练属性.jpg",
-        "洗练概率": f"{image_path_data}洗练概率.jpg",
-        "俱乐部人数": f"{image_path_data}俱乐部人数.jpg",
-        "舔狗日记": f"{image_path_dog}/{random.choice(os.listdir(image_path_dog))}"
-        if os.listdir(image_path_dog) else None,
-        "渣男语录": f"{image_path_man}/{random.choice(os.listdir(image_path_man))}"
-        if os.listdir(image_path_man) else None,
-        "帮助": f"{image_path}menu.jpg",
-        "菜单": f"{image_path}menu.jpg",
-    }
-    menu_text = "\n发送 '帮助' 或 '菜单' 查看更多功能"  # 菜单提示
-    text_dict = {
-        "sad": f"怎么啦小广，是碰到什么不好的事了嘛🥹{menu_text}",
-        "贝贝": f"贝贝是爸爸的爱人，她很可爱哦😊{menu_text}",
-        "吴广安": f"吴广安是小菜瓜🐸{menu_text}",
-        "Isaac": f"Isaac是小宝的爸爸,他是个厉害的人💫{menu_text}",
-        "朱欣园": f"Isaac是小宝的爸爸,他是个厉害的人💫{menu_text}",
-    }
-    video_path = "/Users/isaac/Documents/costway_dify/static_files/video/"
-    video_xiaojiejie_path = "/Users/isaac/Documents/costway_dify/static_files/video/小姐姐/"
-    video_xiaogege_path = "/Users/isaac/Documents/costway_dify/static_files/video/小哥哥/"
-    video_dict = {
-        "测试视频": f"{video_path}test.mp4",
-        "小姐姐视频": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "小哥哥视频": f"{video_xiaogege_path}/{random.choice(os.listdir(video_xiaogege_path))}"
-        if os.listdir(video_xiaogege_path) else None,
-        "狱卒": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "甜美": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "jk": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "欲梦": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "双倍快乐": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "热舞": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "萝莉": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "蛇姐": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-        "漫画芋": f"{video_xiaojiejie_path}/{random.choice(os.listdir(video_xiaojiejie_path))}"
-        if os.listdir(video_xiaojiejie_path) else None,
-    }
-    file_path = "/Users/isaac/Documents/costway_dify/static_files/file/"
-    file_dict = {
-        "测试文件": f"{file_path}test.txt",
-    }
     try:
         cmsg = WechatMessage(msg, True)
     except NotImplementedError as e:
         logger.debug("[WX]group message {} skipped: {}".format(msg["MsgId"], e))
         return None
-    # 如果收到的是自定义消息
-    if cmsg.ctype == ContextType.TEXT:
-
-        # 匹配自定义回复
-        match cmsg.content:
-            # 匹配文本回复
-            case content if content in text_dict:
-                itchat.send(text_dict[content], toUserName=cmsg.other_user_id)
-                return
-            # 匹配图片回复
-            case content if content in image_dict:
-                image_path = image_dict[content]
-                itchat.send_image(image_path, toUserName=cmsg.other_user_id)
-                return
-            # 匹配视频回复
-            case content if content in video_dict:
-                video_path = video_dict[content]
-                itchat.send_video(video_path, toUserName=cmsg.other_user_id)
-                return
-            # 匹配文件回复
-            case content if content in file_dict:
-                file_path = file_dict[content]
-                itchat.send_file(file_path, toUserName=cmsg.other_user_id)
-                return
-            case _:
-                WechatChannel().handle_group(cmsg)
-                return None
     WechatChannel().handle_group(cmsg)
     return None
-
 
 # 自动接受加好友
 @itchat.msg_register(FRIENDS)
@@ -174,7 +57,6 @@ def deal_with_friend(msg):
         return None
     WechatChannel().handle_friend_request(cmsg)
     return None
-
 
 def _check(func):
     def wrapper(self, cmsg: ChatMessage):
@@ -231,114 +113,6 @@ def qrCallback(uuid, status, qrcode):
         qr.print_ascii(invert=True)
 
 
-class Watchdog:
-    """
-    看门狗类，用于监控文件变化
-    """
-
-    def __init__(self, filename, interval, callback):
-        self.filename = filename  # 文件名
-        self.interval = interval  # 检查间隔
-        self.callback = callback  # 回调函数
-        self.last_checked_content = None  # 上次读取的文件内容
-
-    def check_file(self):
-        try:
-            with open(self.filename, 'r') as file:
-                file_content = file.read().strip()
-                if not file_content:
-                    time.sleep(1)  # 休眠一秒钟
-                    return
-
-                try:
-                    data_list = json.loads(file_content)
-                except json.JSONDecodeError as e:
-                    logger.error(f"JSON解析错误: {e}")
-                    return
-
-                if data_list:
-                    for data in data_list:
-                        handle_message(data)
-                    with open(self.filename, 'w') as file:
-                        file.write('')
-                else:
-                    logger.error("读取的JSON数据为空,不执行发送")
-        except Exception as e:
-            logger.error(f"读取JSON文件异常: {e}")
-            time.sleep(1)
-
-    def start(self):
-        while True:
-            self.check_file()
-            time.sleep(self.interval)
-
-
-def handle_message(data: dict) -> None:
-    """
-    处理消息内容
-    :param data: 消息内容
-    """
-    try:
-        receiver_name = data["receiver_name"]  # 获取接收者名称
-        message = data["message"]  # 获取消息内容
-        group_name = data["group_name"]  # 获取群聊名称
-
-        # 判断是否是群聊
-        if group_name:
-            # 判断是否有@的名字,群聊消息,reviewer_name可以为空
-            if receiver_name:
-                chatroom = itchat.search_chatrooms(name=group_name)[0]  # 根据群聊名称查找群聊
-                if receiver_name == "所有人" or receiver_name == "all":
-                    message = f"@所有人 {message}"  # 拼接消息内容
-                    itchat.send(msg=f"{message}", toUserName=chatroom.UserName)  # 发送消息
-                else:
-                    # 发送群聊消息,并且@指定好友
-                    friends = itchat.instance.storageClass.search_friends(remarkName=receiver_name)
-                    if friends:
-                        nickname = friends[0].NickName
-                        message = f"@{nickname} {message}"  # 拼接消息内容
-                        itchat.send(msg=f"{message}", toUserName=chatroom.UserName)  # 发送消息
-                    else:
-                        # 如果没有找到指定好友,就直接发送消息,不@任何人
-                        itchat.send(msg=message, toUserName=chatroom.UserName)  # 发送消息
-                logger.info(f"手动发送微信群聊消息成功, 发送群聊:{group_name} 消息内容：{message}")
-            else:
-                # 发送群聊消息
-                chatroom = itchat.search_chatrooms(name=group_name)[0]  # 根据群聊名称查找群聊
-                if chatroom:
-                    itchat.send(msg=message, toUserName=chatroom.UserName)  # 发送消息
-                    logger.info(f"手动发送微信群聊消息成功, 发送群聊:{group_name} 消息内容：{message}")
-        else:
-            remarkName = itchat.instance.storageClass.search_friends(remarkName=receiver_name)  # 根据好友备注名查找好友
-            if remarkName:
-                itchat.send(message, toUserName=remarkName[0].UserName)  # 发送消息
-                logger.info(f"手动发送微信消息成功, 发送人:{remarkName[0].NickName} 消息内容：{message}")
-            else:
-                logger.error(f"没有找到对应的好友：{remarkName}")
-    except Exception as e:
-        logger.error(f"处理消息时发生异常: {e}")
-    finally:
-        # 发送消息后,从JSON文件中删除已发送的消息
-        with open('message.json', 'r') as file:
-            data_list = json.load(file)
-        data_list.remove(data)
-        # 将删除后的数据写入到文件中
-        with open('message.json', 'w') as file:
-            json.dump(data_list, file, ensure_ascii=False)
-        logger.info(f"已从message.json文件中删除已发送的消息{data}")
-
-
-def send_message():
-    """
-    发送消息
-    """
-    # 创建看门狗实例，监控 message.json 文件，每隔5秒检查一次，有变化时调用 handle_message 处理
-    watchdog = Watchdog('message.json', 5, handle_message)
-    thread = threading.Thread(target=watchdog.start)  # 创建线程,并指定线程执行的函数
-    thread.daemon = True  # 设置为守护线程
-    thread.start()  # 启动线程
-
-
 @singleton
 class WechatChannel(ChatChannel):
     NOT_SUPPORT_REPLYTYPE = []
@@ -365,8 +139,6 @@ class WechatChannel(ChatChannel):
             self.user_id = itchat.instance.storageClass.userName
             self.name = itchat.instance.storageClass.nickName
             logger.info("Wechat login success, user_id: {}, nickname: {}".format(self.user_id, self.name))
-            # 增加手动发微信通知的方法
-            send_message()
             # start message listener
             itchat.run()
         except Exception as e:
@@ -431,8 +203,7 @@ class WechatChannel(ChatChannel):
             logger.debug("[WX]receive voice for group msg: {}".format(cmsg.content))
         elif cmsg.ctype == ContextType.IMAGE:
             logger.debug("[WX]receive image for group msg: {}".format(cmsg.content))
-        elif cmsg.ctype in [ContextType.JOIN_GROUP, ContextType.PATPAT, ContextType.ACCEPT_FRIEND,
-                            ContextType.EXIT_GROUP]:
+        elif cmsg.ctype in [ContextType.JOIN_GROUP, ContextType.PATPAT, ContextType.ACCEPT_FRIEND, ContextType.EXIT_GROUP]:
             logger.debug("[WX]receive note msg: {}".format(cmsg.content))
         elif cmsg.ctype == ContextType.TEXT:
             # logger.debug("[WX]receive group msg: {}, cmsg={}".format(json.dumps(cmsg._rawmsg, ensure_ascii=False), cmsg))
@@ -455,6 +226,7 @@ class WechatChannel(ChatChannel):
         context = self._compose_context(cmsg.ctype, cmsg.content, msg=cmsg)
         if context:
             self.produce(context)
+
 
     # 统一的发送函数，每个Channel自行实现，根据reply的type字段发送不同类型的消息
     def send(self, reply: Reply, context: Context):
@@ -507,6 +279,7 @@ class WechatChannel(ChatChannel):
             video_storage.seek(0)
             itchat.send_video(video_storage, toUserName=receiver)
             logger.info("[WX] sendVideo url={}, receiver={}".format(video_url, receiver))
+
         elif reply.type == ReplyType.ACCEPT_FRIEND:  # 新增接受好友申请回复类型
             # 假设 reply.content 包含了新好友的用户名
             is_accept = reply.content
@@ -515,9 +288,7 @@ class WechatChannel(ChatChannel):
                     # 自动接受好友申请
                     debug_msg = itchat.accept_friend(userName=context.content["UserName"], v4=context.content["Ticket"])
                     logger.debug("[WX] accept_friend return: {}".format(debug_msg))
-                    logger.info("[WX] Accepted new friend, UserName={}, NickName={}".format(context.content["UserName"],
-                                                                                            context.content[
-                                                                                                "NickName"]))
+                    logger.info("[WX] Accepted new friend, UserName={}, NickName={}".format(context.content["UserName"], context.content["NickName"]))
                 except Exception as e:
                     logger.error("[WX] Failed to add friend. Error: {}".format(e))
             else:
@@ -554,7 +325,6 @@ class WechatChannel(ChatChannel):
                 # 记录添加成员失败的错误信息
                 logger.error("[WX] Failed to invite members to chatroom. Error: {}".format(e))
 
-
 def _send_login_success():
     try:
         from common.linkai_client import chat_client
@@ -563,7 +333,6 @@ def _send_login_success():
     except Exception as e:
         pass
 
-
 def _send_logout():
     try:
         from common.linkai_client import chat_client
@@ -571,7 +340,6 @@ def _send_logout():
             chat_client.send_logout()
     except Exception as e:
         pass
-
 
 def _send_qr_code(qrcode_list: list):
     try:
