@@ -43,9 +43,9 @@ def get_message(nowtime: str, receiver_name: str, group_names: list, group_type:
         },
         'game': {
             '21:55': f' 竞技场开始偷排名❗️❗️❗\n俱乐部BOOS也不要忘记了❗️❗️❗️',
-            '12:01': f'厨神擂台活动开始了\n别忘记打❗️❗️❗️'
-            if datetime.now().weekday() in [1, 6] else f'俱乐部排位赛报名开始了\n别忘记报名❗️❗️❗️',
-            '19:50': f'盐场马上就要开始了,大家做好准备\n上号❗️上号❗️\n今晚吃鸡❗️❗️❗️️'
+            '12:01': lambda: f'厨神擂台活动开始了\n别忘记打❗️❗️❗️' if datetime.now().weekday() in [1, 6]
+            else f'俱乐部排位赛报名开始了\n别忘记报名❗️❗️❗️' if datetime.now().weekday() in [2, 3, 4] else None,
+            '19:50': lambda: f'盐场马上就要开始了,大家做好准备\n上号❗️上号❗️\n今晚吃鸡❗️❗️❗️️'
             if datetime.now().weekday() == 5 else None
         }
     }
