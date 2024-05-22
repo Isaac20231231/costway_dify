@@ -101,7 +101,7 @@ def build_with_pyinstaller(script_name, clean=False, onefile=False, debug=False,
 
 if __name__ == '__main__':
     # 如果有配置文件 ，可以添加到 additional_files
-    script_name = "wx_api.py"  # 要打包的 Python 脚本名
+    script_name = "app.py"  # 要打包的 Python 脚本名
     # additional_files = [("./costway_health/templates", "costway_health/templates"),
     #                     ("./costway_health/static", "costway_health/static")]  # 需要打包的其他文件
     # # 添加隐藏导入的模块
