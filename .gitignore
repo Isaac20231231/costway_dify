@@ -34,4 +34,3 @@ plugins/banwords/lib/__pycache__
 !plugins/jina_sum/**/
 client_config.json
 /static_files/
-message.json

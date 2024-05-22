@@ -57,7 +57,7 @@ def get_message(nowtime: str, receiver_name: str, group_names: list, group_type:
 
 def write_message_specified_time():
     """
-    编写一个指定时间写入message.json文件的方法
+    编写一个指定时间写入data.json文件的方法
     用来做定时发微信提醒
     """
     receiver_name = ''  # 接收者名称
@@ -71,7 +71,7 @@ def write_message_specified_time():
             data_dict = (get_message(nowtime, receiver_name, myself_group_names, 'myself') or
                          get_message(nowtime, game_receiver_name, game_group_names, 'game'))
             if data_dict:  # 检查 data_dict 是否为空列表
-                with open('message.json', 'w') as file:
+                with open('plugins/file_writer/data.json', 'w') as file:
                     json.dump(data_dict["data_list"], file, ensure_ascii=False)
                     last_write_time = nowtime  # 更新上一次写入的时间
                     time.sleep(1)
