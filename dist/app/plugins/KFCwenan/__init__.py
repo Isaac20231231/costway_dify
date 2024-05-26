@@ -1,1 +1,0 @@
-from .KFCwenan import *

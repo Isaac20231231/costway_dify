@@ -17,3 +17,4 @@ itchat.pkl
 user_datas.pkl
 chatgpt_tool_hub/
 client_config.json
+/dist/

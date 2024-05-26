@@ -1,1 +1,0 @@
-from .tiangou_diary import *
