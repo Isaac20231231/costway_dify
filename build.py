@@ -102,13 +102,11 @@ def build_with_pyinstaller(script_name, clean=False, onefile=False, debug=False,
 if __name__ == '__main__':
     # 如果有配置文件 ，可以添加到 additional_files
     script_name = "app.py"  # 要打包的 Python 脚本名
-    additional_files = [("./config.json", "./config.json"),
-                        ("./plugins/plugins.json", "./plugins/plugins.json")]  # 需要打包的其他文件
+    additional_files = [("./config.json", "./config.json")]  # 需要打包的其他文件
     # 添加 plugins 目录下的所有文件
     for root, dirs, files in os.walk("./plugins"):
         for file in files:
-            if file.endswith(".py"):
-                additional_files.append((os.path.join(root, file), os.path.join(root, file)))
+            additional_files.append((os.path.join(root, file), os.path.join(root, file)))
     # # 添加隐藏导入的模块
     # hidden_imports = [
     #     'costway_us.web.forget_password_pc', 'costway_us.web.loginmobile', 'costway_us.web.loginpc',
@@ -122,5 +120,5 @@ if __name__ == '__main__':
     # 设置 distpath 和 workpath
     distpath = "./dist"
     workpath = "./build"
-    build_with_pyinstaller(script_name, clean=True, onefile=False, debug=False, distpath=distpath, workpath=workpath
+    build_with_pyinstaller(script_name, clean=True, onefile=True, debug=False, distpath=distpath, workpath=workpath
     ,additional_files=additional_files)
