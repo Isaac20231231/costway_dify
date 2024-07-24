@@ -234,8 +234,15 @@ class WechatChannel(ChatChannel):
     def send(self, reply: Reply, context: Context):
         receiver = context.get("receiver")
         if reply.type == ReplyType.TEXT:
-            itchat.send(reply.content, toUserName=receiver)
-            logger.info("[WX] sendMsg={}, receiver={}".format(reply, receiver))
+            # 使用正则表达式来分割消息
+            split_punctuation = ['//n']
+            pattern = '|'.join(map(lambda x: re.escape(x), split_punctuation))
+            split_messages = re.split(pattern, reply.content)
+            # 移除空行
+            split_messages = [msg.strip() for msg in split_messages if msg.strip() != '']
+            for msg in split_messages:
+                itchat.send(msg, toUserName=receiver)
+                logger.info("[WX] sendMsg={}, receiver={}".format(msg, receiver))
         elif reply.type == ReplyType.ERROR or reply.type == ReplyType.INFO:
             itchat.send(reply.content, toUserName=receiver)
             logger.info("[WX] sendMsg={}, receiver={}".format(reply, receiver))
