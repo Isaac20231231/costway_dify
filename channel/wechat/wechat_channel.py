@@ -9,7 +9,6 @@ import json
 import os
 import threading
 import time
-
 import requests
 
 from bridge.context import *
@@ -21,6 +20,7 @@ from common.expired_dict import ExpiredDict
 from common.log import logger
 from common.singleton import singleton
 from common.time_check import time_checker
+from common.utils import convert_webp_to_png
 from config import conf, get_appdata_dir
 from lib import itchat
 from lib.itchat.content import *
@@ -108,7 +108,16 @@ def qrCallback(uuid, status, qrcode):
         print(qr_api4)
         print(qr_api2)
         print(qr_api1)
-        _send_qr_code([qr_api1, qr_api2, qr_api3, qr_api4])
+        qrcodes = [qr_api2, qr_api1, qr_api3, qr_api4]
+        for item in qrcodes:
+            try:
+                response = requests.get(item)
+                response.raise_for_status()
+                with open("wx_qrcode.png", "wb") as f:
+                    f.write(response.content)
+                break
+            except Exception as e:
+                logger.exception(f"[WX_QRCODE]: failed to download qrcode: {e}")
         qr = qrcode.QRCode(border=1)
         qr.add_data(url)
         qr.make(fit=True)
@@ -121,7 +130,7 @@ class WechatChannel(ChatChannel):
 
     def __init__(self):
         super().__init__()
-        self.receivedMsgs = ExpiredDict(60 * 60)
+        self.receivedMsgs = ExpiredDict(conf().get("expires_in_seconds", 3600))
         self.auto_login_times = 0
 
     def startup(self):
@@ -144,24 +153,20 @@ class WechatChannel(ChatChannel):
             # start message listener
             itchat.run()
         except Exception as e:
-            logger.error(e)
+            logger.exception(e)
 
     def exitCallback(self):
         try:
-            from common.linkai_client import chat_client
-            if chat_client.client_id and conf().get("use_linkai"):
-                _send_logout()
-                time.sleep(2)
-                self.auto_login_times += 1
-                if self.auto_login_times < 100:
-                    chat_channel.handler_pool._shutdown = False
-                    self.startup()
+            time.sleep(2)
+            self.auto_login_times += 1
+            if self.auto_login_times < 100:
+                chat_channel.handler_pool._shutdown = False
+                self.startup()
         except Exception as e:
             pass
 
     def loginCallback(self):
         logger.debug("Login success")
-        _send_login_success()
 
     # handle_* 系列函数处理收到的消息后构造Context，然后传入produce函数中处理Context和发送回复
     # Context包含了消息的所有信息，包括以下属性
@@ -234,15 +239,8 @@ class WechatChannel(ChatChannel):
     def send(self, reply: Reply, context: Context):
         receiver = context.get("receiver")
         if reply.type == ReplyType.TEXT:
-            # 使用正则表达式来分割消息
-            split_punctuation = ['//n']
-            pattern = '|'.join(map(lambda x: re.escape(x), split_punctuation))
-            split_messages = re.split(pattern, reply.content)
-            # 移除空行
-            split_messages = [msg.strip() for msg in split_messages if msg.strip() != '']
-            for msg in split_messages:
-                itchat.send(msg, toUserName=receiver)
-                logger.info("[WX] sendMsg={}, receiver={}".format(msg, receiver))
+            itchat.send(reply.content, toUserName=receiver)
+            logger.info("[WX] sendMsg={}, receiver={}".format(reply, receiver))
         elif reply.type == ReplyType.ERROR or reply.type == ReplyType.INFO:
             itchat.send(reply.content, toUserName=receiver)
             logger.info("[WX] sendMsg={}, receiver={}".format(reply, receiver))
@@ -260,6 +258,12 @@ class WechatChannel(ChatChannel):
                 image_storage.write(block)
             logger.info(f"[WX] download image success, size={size}, img_url={img_url}")
             image_storage.seek(0)
+            if ".webp" in img_url:
+                try:
+                    image_storage = convert_webp_to_png(image_storage)
+                except Exception as e:
+                    logger.error(f"Failed to convert image: {e}")
+                    return
             itchat.send_image(image_storage, toUserName=receiver)
             logger.info("[WX] sendImage url={}, receiver={}".format(img_url, receiver))
         elif reply.type == ReplyType.IMAGE:  # 从文件读取图片
@@ -297,8 +301,8 @@ class WechatChannel(ChatChannel):
                     # 自动接受好友申请
                     debug_msg = itchat.accept_friend(userName=context.content["UserName"], v4=context.content["Ticket"])
                     if "accept_friend_msg" in conf():
-                        group_exit_msg = conf().get("accept_friend_msg", "")
-                        itchat.send(group_exit_msg,toUserName=context.content["UserName"])
+                        accept_friend_msg = conf().get("accept_friend_msg", "")
+                        itchat.send(accept_friend_msg, toUserName=context.content["UserName"])
                     logger.debug("[WX] accept_friend return: {}".format(debug_msg))
                     logger.info("[WX] Accepted new friend, UserName={}, NickName={}".format(context.content["UserName"],
                                                                                             context.content[
@@ -365,3 +369,4 @@ def _send_qr_code(qrcode_list: list):
             chat_client.send_qrcode(qrcode_list)
     except Exception as e:
         pass
+

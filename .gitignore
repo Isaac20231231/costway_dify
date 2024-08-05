@@ -33,5 +33,13 @@ plugins/banwords/lib/__pycache__
 !plugins/jina_sum
 !plugins/jina_sum/**/
 client_config.json
-**/wx_crontab.py
-/dist/
+# qrcode
+wx_qrcode.png
+
+# auto coder
+.auto-coder
+actions
+output.txt
+
+# test bot
+test_dify.py
