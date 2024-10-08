@@ -38,6 +38,7 @@ class RolePlay:
     namecn="角色扮演",
     desc="为你的Bot设置预设角色",
     version="1.0",
+    enabled=False,
     author="lanvent",
 )
 class Role(Plugin):
@@ -69,11 +70,9 @@ class Role(Plugin):
             logger.info("[Role] inited")
         except Exception as e:
             if isinstance(e, FileNotFoundError):
-                logger.warn(
-                    f"[Role] init failed, {config_path} not found, ignore or see https://github.com/zhayujie/chatgpt-on-wechat/tree/master/plugins/role .")
+                logger.warn(f"[Role] init failed, {config_path} not found, ignore or see https://github.com/zhayujie/chatgpt-on-wechat/tree/master/plugins/role .")
             else:
-                logger.warn(
-                    "[Role] init failed, ignore or see https://github.com/zhayujie/chatgpt-on-wechat/tree/master/plugins/role .")
+                logger.warn("[Role] init failed, ignore or see https://github.com/zhayujie/chatgpt-on-wechat/tree/master/plugins/role .")
             raise e
 
     def get_role(self, name, find_closest=True, min_sim=0.35):
@@ -101,13 +100,15 @@ class Role(Plugin):
         if e_context["context"].type != ContextType.TEXT:
             return
         btype = Bridge().get_bot_type("chat")
-        if btype not in [const.OPEN_AI, const.CHATGPT, const.CHATGPTONAZURE, const.QWEN_DASHSCOPE, const.XUNFEI,
-                         const.BAIDU, const.ZHIPU_AI, const.MOONSHOT, const.MiniMax, const.COZE]:
+        if btype not in [const.OPEN_AI, const.CHATGPT, const.CHATGPTONAZURE, const.QWEN_DASHSCOPE, const.XUNFEI, const.BAIDU, const.ZHIPU_AI, const.MOONSHOT, const.MiniMax, const.DIFY, const.COZE]:
             logger.warn(f'不支持的bot: {btype}')
             return
         bot = Bridge().get_bot("chat")
         content = e_context["context"].content[:]
         clist = e_context["context"].content.split(maxsplit=1)
+        if len(clist) == 0:
+            logger.warning("[Role] on_handle_context. clist is empty, skipped role plugin")
+            return
         desckey = None
         customize = False
         sessionid = e_context["context"]["session_id"]
