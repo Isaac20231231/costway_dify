@@ -2,6 +2,7 @@ import os
 import json
 import web
 from urllib.parse import urlparse
+import re
 
 from bridge.context import Context
 from bridge.reply import Reply, ReplyType
@@ -106,11 +107,22 @@ class GeWeChatChannel(ChatChannel):
         gewechat_message = context.get("msg")
         if reply.type in [ReplyType.TEXT, ReplyType.ERROR, ReplyType.INFO]:
             reply_text = reply.content
+            # 使用正则表达式来分割消息
+            split_punctuation = ['//n'] 
+            pattern = '|'.join(map(lambda x: re.escape(x), split_punctuation))
+            split_messages = re.split(pattern, reply_text)
+            # 移除空行
+            split_messages = [msg.strip() for msg in split_messages if msg.strip() != '']
+            
             ats = ""
             if gewechat_message and gewechat_message.is_group:
                 ats = gewechat_message.actual_user_id
-            self.client.post_text(self.app_id, receiver, reply_text, ats)
-            logger.info("[gewechat] Do send text to {}: {}".format(receiver, reply_text))
+                
+            # 分段发送消息
+            for msg in split_messages:
+                self.client.post_text(self.app_id, receiver, msg, ats)
+                logger.info("app_id: {}, receiver: {}, reply_text: {}".format(self.app_id, receiver, msg))
+                logger.info("[gewechat] Do send text to {}: {}".format(receiver, msg))
         elif reply.type == ReplyType.VOICE:
             try:
                 # TODO: mp3 to silk
