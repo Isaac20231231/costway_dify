@@ -160,8 +160,6 @@ class GeWeChatChannel(ChatChannel):
             img_url = callback_url + "?file=" + img_file_path
             self.client.post_image(self.app_id, receiver, img_url)
             logger.info("[gewechat] sendImage, receiver={}, url={}".format(receiver, img_url))
-            self.client.post_image(self.app_id, receiver, image_storage.read())
-            logger.info("[gewechat] sendImage, receiver={}".format(receiver))
         elif reply.type == ReplyType.ACCEPT_FRIEND:  # 新增接受好友申请的处理
             is_accept = reply.content
             if is_accept:
