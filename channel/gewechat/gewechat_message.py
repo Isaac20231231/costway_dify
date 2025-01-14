@@ -37,6 +37,15 @@ class GeWeChatMessage(ChatMessage):
             self.ctype = ContextType.IMAGE
             self.content = TmpDir().path() + str(self.msg_id) + ".png"
             self._prepare_fn = self.download_image
+        elif msg_type == 37:  # 好友申请消息
+            self.ctype = ContextType.ACCEPT_FRIEND
+            self.content = {
+                "UserName": msg.get("fromUserName", ""),  # 申请人的 wxid
+                "Ticket": msg.get("ticket", ""),  # 好友申请票据
+                "Content": msg.get("content", ""),  # 验证信息
+                "NickName": msg.get("nickName", "")  # 申请人昵称
+            }
+            logger.info(f"[gewechat] received friend request from {self.content['NickName']}")
         else:
             raise NotImplementedError("Unsupported message type: Type:{}".format(msg_type))
 
