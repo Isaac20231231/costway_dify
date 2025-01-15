@@ -160,39 +160,6 @@ class GeWeChatChannel(ChatChannel):
             img_url = callback_url + "?file=" + img_file_path
             self.client.post_image(self.app_id, receiver, img_url)
             logger.info("[gewechat] sendImage, receiver={}, url={}".format(receiver, img_url))
-        elif reply.type == ReplyType.ACCEPT_FRIEND:  # 新增接受好友申请的处理
-            is_accept = reply.content
-            if is_accept:
-                try:
-                    # 获取好友申请信息
-                    v3 = ""  # 可能需要从消息中获取
-                    v4 = context.content.get("Ticket", "")
-                    scene = 3  # 通过搜索添加
-                    content = ""  # 可以是回复的内容
-
-                    # 调用接受好友API
-                    result = self.client.add_contacts(
-                        self.app_id,
-                        scene=scene,
-                        option=2,  # 2表示接受好友申请
-                        v3=v3,
-                        v4=v4,
-                        content=content
-                    )
-
-                    if result.get("ret") == 200:
-                        # 如果配置了欢迎语，发送欢迎消息
-                        if "accept_friend_msg" in conf():
-                            welcome_msg = conf().get("accept_friend_msg", "")
-                            if welcome_msg:
-                                self.client.post_text(self.app_id, context.content["UserName"], welcome_msg)
-                        logger.info(f"[gewechat] Accepted new friend request from {context.content['NickName']}")
-                    else:
-                        logger.error(f"[gewechat] Failed to accept friend request: {result}")
-                except Exception as e:
-                    logger.error(f"[gewechat] Error accepting friend request: {e}")
-            else:
-                logger.info(f"[gewechat] Ignored friend request from {context.content['NickName']}")
 
 class Query:
     def GET(self):
