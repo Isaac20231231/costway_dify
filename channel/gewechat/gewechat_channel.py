@@ -124,7 +124,6 @@ class GeWeChatChannel(ChatChannel):
             # 分段发送消息
             for msg in split_messages:
                 self.client.post_text(self.app_id, receiver, msg, ats)
-                logger.info("app_id: {}, receiver: {}, reply_text: {}".format(self.app_id, receiver, msg))
                 logger.info("[gewechat] Do send text to {}: {}".format(receiver, msg))
         elif reply.type == ReplyType.VOICE:
             try:
